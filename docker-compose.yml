@@ -8,6 +8,7 @@ services:
       - 4001:4001
     volumes:
       - .:/app
+      - ./spec/fixtures/form:/app/form
     environment:
-      - URL_HOST=app.test
+      - URL_HOST=app.test:4001
       - MOKTA_ISSUER=https://cadev.oktapreview.com

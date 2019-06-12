@@ -23,14 +23,14 @@ post "/login" do
   else
     redirect "#{env_redirect_url}?id_token=#{token}", 307
   end
-rescue Errno::ENOENT
-  @error = "User not found"
-  status 404
-  haml :embed_uri_form
 rescue OtpFailed
   @error = "Code not verified"
   status 403
   haml :otp
+end
+
+get "/" do
+  redirect "embed_uri"
 end
 
 get "/embed_uri" do
@@ -50,6 +50,25 @@ get "/signout" do
 
   redirect params[:fromURI], 307 if matches_host_origin?(params[:fromURI])
 end
+
+session = lambda do
+  redirect "embed_uri" unless params[:id_token]
+
+  @claims = JWT.decode params[:id_token],
+                       Auth::KEY.public_key,
+                       true,
+                       algorithm: "RS256",
+                       iss: env_issuer,
+                       aud: env_audience,
+                       verify_iss: true,
+                       verify_aud: true,
+                       verify_jti: true,
+                       verify_iat: true
+  haml :session
+end
+
+get "/session", &session
+post "/session", &session
 
 # OAuth2
 
@@ -92,8 +111,15 @@ end
 private
 
 def user_claims
-  role = params[:username][/\A([^@]+)/, 1] || "test.user"
-  read_json(role).merge(time_claims)
+  {
+    sub: Digest::SHA1.hexdigest(preferred_username),
+    iss: env_issuer,
+    aud: env_audience,
+    given_name: first_name,
+    family_name: last_name,
+    preferred_username: preferred_username,
+    zoneinfo: "Europe/London"
+  }.merge(custom_claims).merge(time_claims)
 end
 
 def oauth_claims(params)
@@ -102,12 +128,35 @@ def oauth_claims(params)
     .merge(scp: params[:scope].split)
 end
 
-def time_claims
-  { iat: Time.now.to_i, exp: (Time.now + 3600).to_i }
+def username_parts
+  name = params[:username][/\A([^@]+)/, 1]&.strip || "Test User"
+  name = name.split(/[._\s]+/)
+  name = ["Test", *name] if name.size == 1
+  name
 end
 
-def read_json(file_name)
-  JSON.parse(File.read("data/#{file_name}.json"))
+def first_name
+  username_parts[0...-1].join(" ")
+end
+
+def last_name
+  username_parts.last
+end
+
+def preferred_username
+  "#{username_parts.join('.').downcase}@citizensadvice.org.uk"
+end
+
+def custom_claims
+  params.fetch(:claims, {})
+end
+
+def time_claims
+  {
+    iat: Time.now.to_i,
+    jti: Digest::MD5.hexdigest([Auth::KEY, Time.now.to_i].join(":")),
+    exp: (Time.now + 3600).to_i
+  }
 end
 
 def env_redirect_url
@@ -116,6 +165,10 @@ end
 
 def env_issuer
   ENV.fetch("MOKTA_ISSUER", "https://cadev.oktapreview.com")
+end
+
+def env_audience
+  ENV.fetch("AUTH_AUDIENCE", "mokta")
 end
 
 def matches_host_origin?(url)
@@ -129,4 +182,8 @@ def verify_otp
   raise OtpFailed unless ROTP::TOTP.new(ENV["OTP_SECRET"]).verify(params[:code])
 
   true
+end
+
+def presence(value)
+  value&.empty? ? nil : value
 end

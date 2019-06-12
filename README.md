@@ -1,4 +1,5 @@
 # mokta
+
 Mock Okta
 
 ## Build
@@ -8,35 +9,26 @@ Mock Okta
 ## Start
 
 ```
-docker-compose run -p 4001:4001 -v /path/to/fixtures:/app/data app
+docker-compose up
+
+# OR
+
+docker-compose run -p 4001:4001 -v /path/to/custom/form:/app/form app
 ```
 
-```
-docker run
-  -p 4001:4001
-  -v your-okta-json-directory:/app/data
-  --env URL_HOST=app.test
-  --env MOKTA_ISSUER=https://cadev.oktapreview.com
-  --env MOKTA_REDIRECT_URL=http://app.test:3001/session
-citizensadvice/mokta
-```
+Visit http://localhost:4001/embed_uri
 
 ### JWT claims
 
-Example JSON claims file:
+The family name and given name are automatically generated from the username. A `sub` is generated from the hash of the preferred username.
 
-```
-{
-  "iss": "https://cadev.oktapreview.com",
-  "zoneinfo": "Europe/London",
-}
-```
+Like Okta, the domain `@citizensadvice.org.uk` is optional in the username.
 
-You can link to your host folder with `-v your-okta-json-directory:/app/data`
-
-The login maps from `test.user@email.com` to `test.user.json` in the data folder.
+Additional claims are generated from a [custom form](spec/fixtures/custom_form.haml) using the param `claims`.
 
 Passwords are ignored as we are not testing Okta itself.
+
+If an `OTP_SECRET` env is provided, 2FA will be enabled.
 
 ### Example usage
 
@@ -64,9 +56,10 @@ docker-compose run --rm app bundle exec rspec
 
 ### Configuration
 
-| Key name | Description |
-|---|---|
-| URL_HOST | The parent app host and port |
-| MOKTA_ISSUER | The issuer id must match the iss in your claims |
-| MOKTA_REDIRECT_URL | The URL to redirect to (POST) after login |
-| OTP_SECRET | If present, enable OTP based 2fa | 
+| Key name           | Description                                     |
+| ---                | ---                                             |
+| URL_HOST           | The parent app host and port                    |
+| MOKTA_ISSUER       | The issuer id must match the iss in your claims |
+| AUTH_AUDIENCE      | The audience claim                              |
+| MOKTA_REDIRECT_URL | The URL to redirect to (POST) after login       |
+| OTP_SECRET         | If present, enable OTP based 2fa                |
