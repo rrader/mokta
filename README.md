@@ -66,6 +66,7 @@ docker-compose run --rm app bundle exec rspec
 
 | Key name | Description |
 |---|---|
-| URL_HOST | The parent app host
-| MOKTA_ISSUER | The issuer id must match the iss in your claims
-| MOKTA_REDIRECT_URL | The URL to redirect to (POST) after login
+| URL_HOST | The parent app host and port |
+| MOKTA_ISSUER | The issuer id must match the iss in your claims |
+| MOKTA_REDIRECT_URL | The URL to redirect to (POST) after login |
+| OTP_SECRET | If present, enable OTP based 2fa | 

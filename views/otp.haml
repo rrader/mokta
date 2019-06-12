@@ -1,0 +1,13 @@
+%h5.center 2FA
+
+- if @error
+  .card.error{ role: "alert" }
+    = @error
+
+%form{ name: "login", id: "login-form", action: "/login", method: "post", autocomplete: "off" }
+  %input{ type: "hidden", name: "username", value: params[:username] }
+  %fieldset
+    %label{ for: "code" } Enter Code:
+    %input#code{ type: "text", name: "code", placeholder: "Enter Code" }
+
+    %input.button{ type: "submit", value: "Verify" }

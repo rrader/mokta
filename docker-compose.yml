@@ -11,4 +11,3 @@ services:
     environment:
       - URL_HOST=app.test
       - MOKTA_ISSUER=https://cadev.oktapreview.com
-      - MOKTA_REDIRECT_URL=http://app.test:3000

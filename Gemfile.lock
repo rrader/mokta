@@ -42,6 +42,8 @@ GEM
       rack
     rack-test (1.0.0)
       rack (>= 1.0, < 3)
+    rotp (5.0.0)
+      addressable (~> 2.5)
     rspec (3.7.0)
       rspec-core (~> 3.7.0)
       rspec-expectations (~> 3.7.0)
@@ -91,6 +93,7 @@ DEPENDENCIES
   hamlit
   jwt
   rack-test
+  rotp
   rspec
   sinatra
   sinatra-contrib
@@ -100,4 +103,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   1.16.2
+   1.16.6

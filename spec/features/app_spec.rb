@@ -1,14 +1,18 @@
 # frozen_string_literal: true
 
-require_relative "../../app"
-
-describe "login", type: :feature do
+describe "login", type: :feature do # rubocop:disable Metrics/BlockLength
   it "signs me in" do
     visit "/embed_uri"
     fill_in "Username", with: "username@email.com"
     fill_in "Password", with: "password"
     click_button "Sign In"
-    expect(page.current_path).to eq "/login"
+    expect(URI.parse(page.current_url)).to have_attributes(
+      scheme: "http",
+      host: "app.test",
+      port: 80,
+      path: "/session",
+      query: match(/^id_token=[^&#]+$/)
+    )
   end
 
   it "signs me out if redirect provided" do
@@ -30,5 +34,38 @@ describe "login", type: :feature do
       "use" => "sig",
       "kid" => "kid"
     )
+  end
+
+  context "with MOKTA_REDIRECT_URL" do
+    before do
+      allow(ENV).to receive(:fetch).and_call_original
+      allow(ENV).to receive(:fetch).with("MOKTA_REDIRECT_URL", anything)
+                                   .and_return("http://app.test:3000/redirect_url")
+    end
+
+    it "signs me in" do
+      visit "/embed_uri"
+      fill_in "Username", with: "username@email.com"
+      fill_in "Password", with: "password"
+      click_button "Sign In"
+      expect(page.current_path).to eq "/redirect_url"
+    end
+  end
+
+  context "with 2FA" do
+    before do
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with("OTP_SECRET").and_return("secret")
+    end
+
+    it "signs me in" do
+      visit "/embed_uri"
+      fill_in "Username", with: "username@email.com"
+      fill_in "Password", with: "password"
+      click_button "Sign In"
+      fill_in "Enter Code", with: ROTP::TOTP.new("secret").now
+      click_button "Verify"
+      expect(page.current_path).to eq "/session"
+    end
   end
 end

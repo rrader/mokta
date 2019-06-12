@@ -9,10 +9,12 @@ gem "sinatra-contrib", require: false
 gem "hamlit"
 gem "jwt"
 
+gem "rotp"
+
 group :development do
   gem "byebug"
+  gem "capybara"
   gem "rack-test"
   gem "rspec"
   gem "webmock"
-  gem "capybara"
 end

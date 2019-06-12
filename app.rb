@@ -6,6 +6,9 @@ require "sinatra/json"
 require "hamlit"
 require "jwt"
 require "sinatra/reloader"
+require "rotp"
+
+class OtpFailed < StandardError; end
 
 enable :reloader
 set :root, File.dirname(__FILE__)
@@ -14,7 +17,20 @@ set :haml, format: :html5
 # Login all the time
 post "/login" do
   token = JWT.encode(user_claims, Auth::KEY, "RS256", kid: "kid")
-  redirect "#{env_redirect_url}?id_token=#{token}", 307
+  opt = verify_otp
+  if opt == false
+    haml :otp
+  else
+    redirect "#{env_redirect_url}?id_token=#{token}", 307
+  end
+rescue Errno::ENOENT
+  @error = "User not found"
+  status 404
+  haml :embed_uri_form
+rescue OtpFailed
+  @error = "Code not verified"
+  status 403
+  haml :otp
 end
 
 get "/embed_uri" do
@@ -76,9 +92,17 @@ def read_json(file_name)
 end
 
 def env_redirect_url
-  ENV.fetch("MOKTA_REDIRECT_URL", "http://#{ENV['URL_HOST']}:3000/session")
+  ENV.fetch("MOKTA_REDIRECT_URL", "http://#{ENV['URL_HOST']}/session")
 end
 
 def env_issuer
   ENV.fetch("MOKTA_ISSUER", "https://cadev.oktapreview.com")
+end
+
+def verify_otp
+  return nil unless ENV["OTP_SECRET"]
+  return false unless params[:code]
+  raise OtpFailed unless ROTP::TOTP.new(ENV["OTP_SECRET"]).verify(params[:code])
+
+  true
 end
