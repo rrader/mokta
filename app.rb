@@ -73,7 +73,7 @@ end
 private
 
 def user_claims
-  role = params[:username][/\A(.+)@/, 1] || "test.user"
+  role = params[:username][/\A([^@]+)/, 1] || "test.user"
   read_json(role).merge(time_claims)
 end
 
