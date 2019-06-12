@@ -1,4 +1,4 @@
-%h2.center Sign In
+%h5.center Sign In
 
 - if @error
   .card.error{ role: "alert" }
@@ -13,7 +13,3 @@
     %input#okta-signin-password{ type: "password", name: "password", placeholder: "Password" }
 
     %input#okta-signin-submit.button{ type: "submit", value: "Sign In" }
-
-    %details
-      %input{ type: "hidden", name: "[foo]bar", value: "fee" }
-      %input{ type: "hidden", name: "[foo]foe", value: "fi" }

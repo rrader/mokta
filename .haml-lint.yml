@@ -1,0 +1,14 @@
+linters:
+  LineLength:
+    max: 140
+
+  ClassesBeforeIds:
+    EnforcedStyle: "id"
+
+  ConsecutiveSilentScripts:
+    enabled: false
+    # We do not feel this rule results in cleaner code
+
+  ViewLength:
+    enabled: false
+    # This is recorded on line 0, which means it can't be disabled in a file and doesn't play nicely with editors
