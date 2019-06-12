@@ -48,7 +48,7 @@ end
 get "/signout" do
   return unless params[:fromURI]
 
-  redirect params[:fromURI], 307 if URI(params[:fromURI]).host == ENV["URL_HOST"]
+  redirect params[:fromURI], 307 if matches_host_origin?(params[:fromURI])
 end
 
 # OAuth2
@@ -97,6 +97,11 @@ end
 
 def env_issuer
   ENV.fetch("MOKTA_ISSUER", "https://cadev.oktapreview.com")
+end
+
+def matches_host_origin?(url)
+  uri = URI.parse(url)
+  uri.host + (uri.default_port == uri.port ? "" : ":#{uri.port}") == ENV["URL_HOST"]
 end
 
 def verify_otp

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-describe "login", type: :feature do # rubocop:disable Metrics/BlockLength
+# rubocop:disable Metrics/BlockLength
+describe "login", type: :feature do
   context "config" do
     it "openid_config_uri" do
       visit "/openid_config_uri"
@@ -114,6 +115,26 @@ describe "login", type: :feature do # rubocop:disable Metrics/BlockLength
       visit "/signout?fromURI=http://app.test/session"
       expect(page.current_path).to eq "/session"
     end
-  end
 
+    context "invalid signout host" do
+      it "does not redirect" do
+        visit "/signout?fromURI=http://invalid/session"
+        expect(page.current_path).to eq "/signout"
+      end
+    end
+
+    context "invalid signout port" do
+      before do
+        allow(ENV).to receive(:[]).and_call_original
+        allow(ENV).to receive(:[]).with("URL_HOST")
+                                  .and_return("http://app.test:4000/session")
+      end
+
+      it "does not redirect" do
+        visit "/signout?fromURI=http://app.test:3000/session"
+        expect(page.current_path).to eq "/signout"
+      end
+    end
+  end
 end
+# rubocop:enable Metrics/BlockLength

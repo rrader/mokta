@@ -4,7 +4,6 @@
   .card.error{ role: "alert" }
     = @error
 
-= ENV.inspect
 %form{ name: "login", id: "login-form", action: "/login", method: "post", autocomplete: "off" }
   %fieldset
     %label{ for: "username" } Username:
@@ -14,3 +13,7 @@
     %input#okta-signin-password{ type: "password", name: "password", placeholder: "Password" }
 
     %input#okta-signin-submit.button{ type: "submit", value: "Sign In" }
+
+    %details
+      %input{ type: "hidden", name: "[foo]bar", value: "fee" }
+      %input{ type: "hidden", name: "[foo]foe", value: "fi" }
