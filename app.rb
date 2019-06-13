@@ -31,7 +31,27 @@ end
 
 get "/signout" do
   return unless params[:fromURI]
+
   redirect params[:fromURI], 307 if URI(params[:fromURI]).host == ENV["URL_HOST"]
+end
+
+# OAuth2
+
+get "/oauth2/oauth-authorization-server" do
+  json token_endpoint: url("/oauth2/v1/token"), jwks_uri: url("/oauth2/v1/keys")
+end
+
+get "/oauth2/v1/keys" do
+  json Auth.new.to_jwks
+end
+
+post "/oauth2/v1/token" do
+  json(
+    access_token: JWT.encode(oauth_claims(params), Auth::KEY, "RS256", kid: "kid"),
+    token_type: "Bearer",
+    expires_in: 3600,
+    scope: params[:scope]
+  )
 end
 
 private
@@ -39,6 +59,12 @@ private
 def user_claims
   role = params[:username][/\A(.+)@/, 1] || "test.user"
   read_json(role).merge(time_claims)
+end
+
+def oauth_claims(params)
+  read_json("oauth")
+    .merge(time_claims)
+    .merge(scp: params[:scope].split)
 end
 
 def time_claims
