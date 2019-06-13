@@ -4,7 +4,7 @@
   .card.error{ role: "alert" }
     = @error
 
-%form{ name: "login", id: "login-form", action: "/login", method: "post", autocomplete: "off" }
+%form{ name: "login", id: "login-form", action: "/login", method: "post" }
   %fieldset
     %label{ for: "username" } Username:
     %input#okta-signin-username{ type: "text", name: "username", value: params[:username], placeholder: "Username" }
