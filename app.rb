@@ -70,6 +70,25 @@ post "/oauth2/v1/token" do
   )
 end
 
+# OAuth2
+
+get "/oauth2/oauth-authorization-server" do
+  json token_endpoint: url("/oauth2/v1/token"), jwks_uri: url("/oauth2/v1/keys")
+end
+
+get "/oauth2/v1/keys" do
+  json Auth.new.to_jwks
+end
+
+post "/oauth2/v1/token" do
+  json(
+    access_token: JWT.encode(oauth_claims(params), Auth::KEY, "RS256", kid: "kid"),
+    token_type: "Bearer",
+    expires_in: 3600,
+    scope: params[:scope]
+  )
+end
+
 private
 
 def user_claims
