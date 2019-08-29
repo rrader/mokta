@@ -1,4 +1,4 @@
-# mokta
+# Mokta
 
 Mock Okta
 
@@ -63,3 +63,4 @@ docker-compose run --rm app bundle exec rspec
 | AUTH_AUDIENCE      | The audience claim                              |
 | MOKTA_REDIRECT_URL | The URL to redirect to (POST) after login       |
 | OTP_SECRET         | If present, enable OTP based 2fa                |
+
