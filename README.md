@@ -1,6 +1,4 @@
-# Mokta
-
-Mock Okta
+# Mokta - Mock okta
 
 ## Build
 
