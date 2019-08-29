@@ -25,7 +25,7 @@ describe "login", type: :feature do
       visit "/embed_uri"
       fill_in "Username", with: "Foo.Bar_Foe Fee@email.com"
       fill_in "Password", with: "password"
-      click_button "Sign in"
+      click_button "Sign In"
       uri = URI.parse(page.current_url)
       expect(uri).to have_attributes(
         scheme: "http",
@@ -48,7 +48,7 @@ describe "login", type: :feature do
         visit "/embed_uri"
         fill_in "Username", with: "username"
         fill_in "Password", with: "password"
-        click_button "Sign in"
+        click_button "Sign In"
 
         expect(page.current_path).to eq "/session"
         uri = URI.parse(page.current_url)
@@ -65,7 +65,7 @@ describe "login", type: :feature do
     context "without email" do
       it "signs me in" do
         visit "/embed_uri"
-        click_button "Sign in"
+        click_button "Sign In"
         expect(page.current_path).to eq "/session"
         uri = URI.parse(page.current_url)
         expect(decode_claims(uri.query.sub(/^id_token=/, "")).first).to include(
@@ -84,7 +84,7 @@ describe "login", type: :feature do
         fill_in "Username", with: "username"
         fill_in "Password", with: "password"
         fill_in "Custom", with: "bar"
-        click_button "Sign in"
+        click_button "Sign In"
         expect(page.current_path).to eq "/session"
         uri = URI.parse(page.current_url)
         expect(decode_claims(uri.query.sub(/^id_token=/, "")).first).to include(
@@ -109,7 +109,7 @@ describe "login", type: :feature do
         visit "/embed_uri"
         fill_in "Username", with: "username@email.com"
         fill_in "Password", with: "password"
-        click_button "Sign in"
+        click_button "Sign In"
         expect(page.current_path).to eq "/redirect_url"
       end
     end
@@ -124,7 +124,7 @@ describe "login", type: :feature do
         visit "/embed_uri"
         fill_in "Username", with: "username@email.com"
         fill_in "Password", with: "password"
-        click_button "Sign in"
+        click_button "Sign In"
         fill_in "Enter Code", with: ROTP::TOTP.new("secret").now
         click_button "Verify"
         expect(page.current_path).to eq "/session"
@@ -135,7 +135,7 @@ describe "login", type: :feature do
           visit "/embed_uri"
           fill_in "Username", with: "username@email.com"
           fill_in "Password", with: "password"
-          click_button "Sign in"
+          click_button "Sign In"
           fill_in "Enter Code", with: "foo"
           click_button "Verify"
           expect(page.current_path).to eq "/login"
