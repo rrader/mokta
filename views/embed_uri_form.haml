@@ -17,4 +17,4 @@
       != haml :"../form/custom_form"
     - rescue Errno::ENOENT # rubocop:disable HandleExceptions
 
-    %input{ type: "submit", value: "Sign In" }
+    %input{ autofocus: true, type: "submit", value: "Sign In" }
