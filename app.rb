@@ -73,7 +73,11 @@ post "/session", &session
 # OAuth2
 
 get "/oauth2/oauth-authorization-server" do
-  json token_endpoint: url("/oauth2/v1/token"), jwks_uri: url("/oauth2/v1/keys")
+  json(
+    issuer: url("/oauth2"),
+    token_endpoint: url("/oauth2/v1/token"),
+    jwks_uri: url("/oauth2/v1/keys")
+  )
 end
 
 get "/oauth2/v1/keys" do
@@ -107,6 +111,10 @@ def oauth_claims(params)
   read_json("oauth")
     .merge(time_claims)
     .merge(scp: params[:scope].split)
+end
+
+def read_json(file_name)
+  JSON.parse(File.read("data/#{file_name}.json"))
 end
 
 def username_parts
