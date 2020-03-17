@@ -1,11 +1,21 @@
-FROM ruby:2.5.1
+FROM citizensadvice/sinatra:1.0
 
 ENV APP_ROOT /app
 
 WORKDIR $APP_ROOT
 
 ADD Gemfile* ./
-RUN gem install bundler && bundle install -j3 && bundle clean
+
+RUN \
+  apk update && apk upgrade && \
+  apk --no-cache add \
+    gcc \
+    make \
+    libc-dev
+
+RUN gem update --system && \
+    gem install bundler && \
+    bundle install
 
 COPY . ./
 
