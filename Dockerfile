@@ -1,10 +1,9 @@
-FROM citizensadvice/sinatra:1.0
+FROM ruby:2.7.2-alpine3.12
 
 ENV APP_ROOT /app
+ENV LANG C.UTF-8
 
 WORKDIR $APP_ROOT
-
-ADD Gemfile* ./
 
 RUN \
   apk update && apk upgrade && \
@@ -13,9 +12,12 @@ RUN \
     make \
     libc-dev
 
-RUN gem update --system && \
-    gem install bundler && \
-    bundle install
+ADD Gemfile* ./
+
+RUN \
+  gem update --system && \
+  gem install bundler && \
+  bundle install
 
 COPY . ./
 
