@@ -1,11 +1,23 @@
-FROM ruby:2.5.1
+FROM ruby:2.7.2-alpine3.12
 
 ENV APP_ROOT /app
+ENV LANG C.UTF-8
 
 WORKDIR $APP_ROOT
 
+RUN \
+  apk update && apk upgrade && \
+  apk --no-cache add \
+    gcc \
+    make \
+    libc-dev
+
 ADD Gemfile* ./
-RUN gem install bundler && bundle install -j3 && bundle clean
+
+RUN \
+  gem update --system && \
+  gem install bundler && \
+  bundle install
 
 COPY . ./
 
