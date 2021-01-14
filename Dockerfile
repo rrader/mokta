@@ -10,7 +10,9 @@ RUN \
   apk --no-cache add \
     gcc \
     make \
-    libc-dev
+    libc-dev \
+    libxml2 \
+    patch
 
 ADD Gemfile* ./
 
